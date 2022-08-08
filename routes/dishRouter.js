@@ -212,9 +212,9 @@ dishRouter.route('/:dishId/comments/:commentId')  //comment id
                     }
                 }
 
-                // res.statusCode = 200;
-                // res.setHeader('Content-Type', 'application/json');
-                res.statusCode(200).setHeader('Content-Type', 'application/json').json(dish.comments.id(req.params.commentId));
+                 res.statusCode = 200;
+                 res.setHeader('Content-Type', 'application/json');
+                res.json(dish.comments.id(req.params.commentId));
 
             }, (err) => {
 
