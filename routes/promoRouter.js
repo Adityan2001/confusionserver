@@ -1,52 +1,113 @@
-const express=require('express');
-const bodyParser = require ('body-parser');
+const express = require('express');
+const mongoose = require('mongoose');
+const Promotions = require('../models/promotions');
+const promoRouter = express.Router();
 
-const promRouter = express.Router();
-
-promRouter.route('/')
-.all((req,res,next)=>{
-    res.statusCode=200;
-    res.setHeader('Content-Type','application/json');
-    next();
-})
-.get((req,res,next)=>{
-    res.end('GET for promotions');
-})
-
-.post((req,res,next)=>{
-    res.end("POST for promotions");
-})
-
-.put((req,res,next)=>{
-    res.end('PUT not Supported on '+'promotions');
-})
-
-.delete((req,res,next)=>{
-    res.end('Delete all promotions');
-});
-
-//routes within parameters dishId
-promRouter.route('/:promId')
-.all((req,res,next)=>{
-   // removeEventListener.statusCode = 200;
-    res.setHeader('Content-Type','application/json');
-    next();
-})
-.get((req,res,next)=>{
-    res.end('Get for promotion ID: '+req.params.promId);
-})
-
-.post((req,res,next)=>{
-    res.end('Post not supported on promotions/promoid');
-})
-
-.put((req,res,next)=>{
-    res.end('PUT for Promotion with id: '+req.params.promId);
-})
-
-.delete((req,res,next)=>{
-    res.end('Deleting promotion with id: '+req.params.promId);
-});
+promoRouter.route('/')
+    .get((req, res, next) => {
+        Promotions.find({})
+            .then((promotions) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(promotions);
+            }, (err) => {
+                next(err);
+            })
+            .catch((err) => {
+                next(err);
+            });
+    })
 
 
-module.exports = promRouter;
+    .post((req, res, next) => {
+        Promotions.create(req.body)
+            .then((promo) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(promo);
+            }, (err) => {
+                next(err);
+            })
+            .catch((err) => {
+                next(err);
+            });
+    })
+
+
+    .put((req, res, next) => {
+        res.statusCode = 403;
+        res.end('Not Supported on ' + 'promotions');
+    })
+
+
+    .delete((req, res, next) => {
+        Promotions.deleteMany({})
+            .then((promo) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(promo);
+            }, (err) => {
+                next(err);
+            })
+            .catch((err) => {
+                next(err);
+            });
+    });
+
+
+
+
+
+promoRouter.route('/:promoId')       //PRomotion Id
+    .get((req, res, next) => {
+        Promotions.findById(req.params.promoId).
+            then((promotion) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(promotion);
+            }, (err) => {
+                next(err);
+            })
+            .catch((err) => {
+                next(err);
+            });
+    })
+
+
+    .post((req, res, next) => {
+        res.end('Post not supported on promotions/promoId');
+    })
+
+
+    .put((req, res, next) => {
+        Promotions.findByIdAndUpdate(req.params.promoId, { $set: req.body },
+            { new: true }).
+            then((promo) => {
+                res.statusCode = 200
+                res.setHeader('Content-Type', 'application/json');
+                res.json(promo);
+            }, (err) => {
+                next(err);
+            })
+            .catch((err) => {
+                next(err);
+            });
+    })
+
+    .delete((req, res, next) => {
+        Promotions.findByIdAndDelete(req.params.promoId)
+            .then((resp) => {
+                res.statusCode = 200
+                res.setHeader('Content-Type', 'application/json');
+                res.json(resp);
+            }, (err) => {
+                next(err);
+            })
+            .catch((err) => {
+                next(err);
+
+
+            });
+    });
+
+    module.exports = promoRouter;

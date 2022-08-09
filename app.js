@@ -8,13 +8,14 @@ var mongoose = require('mongoose');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+
 var dishRouter = require('./routes/dishRouter');
-// var leaderRouter = require('./routes/leaderRouter');
-// var promoRouter = require('./routes/promoRouter');
 var leaderRouter = require('./routes/leaderRouter');
 var promoRouter = require('./routes/promoRouter');
-//var app = express();
-varDishes = require('./models/dishes');
+
+var Dishes = require('./models/dishes');
+var Promotions = require('./models/promotions');
+var Leaders = require('./models/leaders');
 
 const url = 'mongodb://localhost:27017/conFusion';
 
