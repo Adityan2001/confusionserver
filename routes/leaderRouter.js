@@ -95,7 +95,7 @@ leaderRouter.route('/')
     })
 
     .delete((req, res, next) => {
-        Promotions.findByIdAndDelete(req.params.leaderId)
+        Leaders.findByIdAndDelete(req.params.leaderId)
             .then((resp) => {
                 res.statusCode = 200
                 res.setHeader('Content-Type', 'application/json');
