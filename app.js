@@ -1,10 +1,13 @@
 var createError = require('http-errors');
-var express = require('express');
 
+var express = require('express');
+var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var path = require('path');
+
 var mongoose = require('mongoose');
+var session = require('express-session');
+var FileStore=require('session-file-store')(session);
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -24,40 +27,112 @@ connect.then((db) => {
   console.log('Connected to the database');
 }, (err) => {
   console.log(err);
-});
+})
 
 var app = express();
 
+app.use(cookieParser('12345-67890-09876-54321'));
+app.use(session({
+  name : 'session-id',
+  secret:'12345-67890-09876-54321',
+  saveUninitialized:false,
+  resave :false,
+  store:new FileStore()
+}))
+
 function auth(req,res,next){
-  console.log(req.headers);
-  var authHeader=req.headers.authorization
+ // console.log(req.headers);
+  // var authHeader=req.headers.authorization
 
-  if(!authHeader){
-    var err =new Error('You are not authenticated');
-    res.setHeader('WWW-Authenticate','Basic');
-    err.staus =401;
-    next(err);
-    return;
-  }
-
-  var auth=new Buffer.from(authHeader.split(' ')[1],'base64').
-  toString().split(':');
-
-  var user=auth[0];
-  var pass =auth[1];
-  if(user=='admin' && pass=='password'){
+if(!req.session.user){
+  var err =new Error('You are not authenticated');
+  err.status=403;
+  return next(err);
+} else {
+  if(req.session.user==='authenticated'){
     next();
   }
-  else{
-    var err =new Error('You are not authenticated');
-    res.setHeader('WWW-Authenticate','Basic');
-    err.staus =401;
-    next(err);
-    return;
-    
+  else
+    {
+    var err=new Error("You are not authenticated");
+    err.status=403;
+    return next(err);
+
+    }
   }
 
 }
+//   var authHeader=req.headers.authorization;
+//   if(!authHeader){
+//     var err =new Error('You are not authenticated');
+//     res.setHeader('WWW-Authenticate','Basic');
+//     err.staus =401;
+//     next(err);
+//     return;
+//   }
+
+//   var auth=new Buffer.from(authHeader.split(' ')[1],'base64').
+//   toString().split(':');
+
+//   var user=auth[0];
+//   var pass =auth[1];
+//   if(user=='admin' && pass=='password'){
+//     //res.cookie('user','admin',{signed:true});
+//     req.session.user='admin';
+//     next();
+//   }  else{
+//     var err =new Error('You are not authenticated');
+//     res.setHeader('WWW-Authenticate','Basic');
+//     err.staus =401;
+//     next(err);
+//     return;
+//      }
+//    }else{
+//     if(req.session.user==='admin'){
+//       console.log(req.session.user);
+//       next();
+//     }else{
+//       var err =new Error('You are not authenticated');
+//     res.setHeader('WWW-Authenticate','Basic');
+//     err.staus =401;
+//     next(err);
+//     }
+//    }
+// }
+
+
+
+
+
+
+
+
+  // if(!authHeader){
+  //   var err =new Error('You are not authenticated');
+  //   res.setHeader('WWW-Authenticate','Basic');
+  //   err.staus =401;
+  //   next(err);
+  //   return;
+  // }
+
+//   var auth=new Buffer.from(authHeader.split(' ')[1],'base64').
+//   toString().split(':');
+
+//   var user=auth[0];
+//   var pass =auth[1];
+//   if(user=='admin' && pass=='password'){
+//     next();
+//   }
+//   else{
+//     var err =new Error('You are not authenticated');
+//     res.setHeader('WWW-Authenticate','Basic');
+//     err.staus =401;
+//     next(err);
+//     return;
+    
+//   }
+
+// }
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -69,10 +144,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(auth);
+// app.use(auth);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+
+app.use(auth);
 app.use('/dishes', dishRouter);
+
+
 app.use('/leaders', leaderRouter);
 app.use('/promotions', promoRouter);
 
@@ -126,6 +205,6 @@ module.exports = app;
 // });
 
 // module.exports = app;
-app.listen(4000, (req, res) => {
-  console.log("SERVER STARTED");
-})
+// app.listen(4000, (req, res) => {
+//   console.log("SERVER STARTED");
+// })
