@@ -3,6 +3,14 @@ var Schema=mongoose.Schema;
 var passportLocalMongoose=require('passport-local-mongoose');
 
 var User=new Schema ({
+    firstname:{
+        type :String,
+        dafault :" "
+    },
+    lastname:{
+        type :String,
+        dafault :" "
+    },
     admin: {
         type:Boolean,
         default: false
