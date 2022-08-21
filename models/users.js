@@ -21,6 +21,7 @@ var User=new Schema ({
     timestamps:true
      
 });
+
 User.plugin(passportLocalMongoose);
 
 module.exports = mongoose.model('User',User);

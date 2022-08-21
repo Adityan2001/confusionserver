@@ -5,7 +5,7 @@ const Dishes = require('../models/dishes');
 const dishRouter = express.Router();
 
 
-dishRouter.route('/')
+dishRouter.route('/')       
     .get((req, res, next) => {
         Dishes.find({})
         .populate('comments.author')
@@ -58,7 +58,7 @@ dishRouter.route('/')
     });
 
 
-
+/*************************************************************************DISH ID **************************************************************************************** */
 
 
 dishRouter.route('/:dishId')       //DishId
@@ -113,7 +113,7 @@ dishRouter.route('/:dishId')       //DishId
 
             });
     });
-//*****************************COMMENTS*********************************//
+/* ******************************************************************COMMENTS************************************************************************************/
 
 dishRouter.route('/:dishId/comments')
     .get((req, res, next) => {
@@ -134,6 +134,7 @@ dishRouter.route('/:dishId/comments')
             .catch((err) => next(err));
 
     })
+
     .post(authenticate.verifyOrdinaryUser, (req, res, next) => {
         Dishes.findById(req.params.dishId)
         .then((dish) => {
@@ -151,6 +152,7 @@ dishRouter.route('/:dishId/comments')
                 })
             }, (err) => next(err));
         }
+        
         else {
             err = new Error('Dish ' + req.params.dishId + ' not found');
             err.status = 404;
@@ -195,9 +197,9 @@ dishRouter.route('/:dishId/comments')
     })
 
 
+/******************************************************************comment id*********************************************************************************/
 
-
-dishRouter.route('/:dishId/comments/:commentId')  //comment id
+dishRouter.route('/:dishId/comments/:commentId')  
 
     .get((req, res, next) => {
         Dishes.findById(req.params.dishId)
