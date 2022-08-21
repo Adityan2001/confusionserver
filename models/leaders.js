@@ -1,12 +1,9 @@
 const mongoose = require('mongoose');
-//require('mongoose-currency').loadType(mongoose);
-
-// const Currency = mongoose.Types.Currency;
 
 const Schema = mongoose.Schema;
 
-
 const LeadersSchema = new Schema({
+    
     name:{
         type: String,
         required: true,
@@ -36,7 +33,11 @@ const LeadersSchema = new Schema({
     featured:{
         type: Boolean,
         default:false
-    }
+    },
+
+},{
+ 
+    timestamps:true
     
 });
 

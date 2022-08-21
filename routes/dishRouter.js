@@ -22,7 +22,7 @@ dishRouter.route('/')
     })
 
 
-    .post(authenticate.verifyUser, (req, res, next) => {
+    .post(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin, (req, res, next) => {
         Dishes.create(req.body)
             .then((dish) => {
                 res.statusCode = 200;
@@ -37,13 +37,13 @@ dishRouter.route('/')
     })
 
 
-    .put((req, res, next) => {
+    .put(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin,(req, res, next) => {
         res.statusCode = 403;
         res.end('Not Supported on ' + 'dishes');
     })
 
 
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin,(req, res, next) => {
         Dishes.deleteMany({})
             .then((dish) => {
                 res.statusCode = 200;
@@ -78,12 +78,12 @@ dishRouter.route('/:dishId')       //DishId
     })
 
 
-    .post((req, res, next) => {
+    .post(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin,(req, res, next) => {
         res.end('Post not supported on dishes/dishId');
     })
 
 
-    .put((req, res, next) => {
+    .put(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin,(req, res, next) => {
         Dishes.findByIdAndUpdate(req.params.dishId, { $set: req.body },
             { new: true }).
             then((dish) => {
@@ -98,7 +98,7 @@ dishRouter.route('/:dishId')       //DishId
             });
     })
 
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin,(req, res, next) => {
         Dishes.findByIdAndDelete(req.params.dishId)
             .then((resp) => {
                 res.statusCode = 200
@@ -113,7 +113,7 @@ dishRouter.route('/:dishId')       //DishId
 
             });
     });
-
+//*****************************COMMENTS*********************************//
 
 dishRouter.route('/:dishId/comments')
     .get((req, res, next) => {
@@ -134,7 +134,7 @@ dishRouter.route('/:dishId/comments')
             .catch((err) => next(err));
 
     })
-    .post(authenticate.verifyUser, (req, res, next) => {
+    .post(authenticate.verifyOrdinaryUser, (req, res, next) => {
         Dishes.findById(req.params.dishId)
         .then((dish) => {
             if (dish != null) {
@@ -161,14 +161,14 @@ dishRouter.route('/:dishId/comments')
         })
                
 
-    .put(authenticate.verifyUser ,(req, res, next) => {
+    .put(authenticate.verifyOrdinaryUser ,(req, res, next) => {
         res.statusCode = 403;
         res.end('PUT not Supported on ' + 'dishes/' + req.params.dishId + '/comments');
 
     })
 
 
-    .delete(authenticate.verifyUser ,(req, res, next) => {
+    .delete(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin,(req, res, next) => {
         Dishes.findById(req.params.dishId)
             .then((dish) => {
                 if (dish != null) {
@@ -235,14 +235,14 @@ dishRouter.route('/:dishId/comments/:commentId')  //comment id
     })
 
 
-    .post((req, res, next) => {
+    .post(authenticate.verifyOrdinaryUser ,(req, res, next) => {
         res.statusCode = 403;
         res.end('POST operation not supported on Dishes/' + req.params.dishId
             + '/comments/' + req.params.commentId);
     })
 
 
-    .put((req, res, next) => {
+    .put(authenticate.verifyOrdinaryUser ,(req, res, next) => {
         Dishes.findById(req.params.dishId)
             .then((dish) => {
 
@@ -258,6 +258,15 @@ dishRouter.route('/:dishId/comments/:commentId')  //comment id
 
                     err = new Error('Comment ' + req.params.commentId + ' not found');
                     err.status = 404;
+                    return next(err);
+                }
+
+                var current_user_id=req.user._id;
+                var comment_author_id=dish.comment.id(req.params.commentId).author._id;
+                if(current_user_id!=comment_author_id)
+                {
+                    err = new Error("You can not update this comment //This comment is not belongs to you");
+                    err.status = 403;
                     return next(err);
                 }
 
@@ -295,7 +304,7 @@ dishRouter.route('/:dishId/comments/:commentId')  //comment id
     })
 
 
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyOrdinaryUser,(req, res, next) => {
         Dishes.findById(req.params.dishId)
             .then((dish) => {
 
@@ -312,6 +321,16 @@ dishRouter.route('/:dishId/comments/:commentId')  //comment id
                     return next(err);
 
                 }
+
+                var current_user_id=req.user._id;
+                var comment_author_id=dish.comments.id(req.params.commentId).author._id;
+                if(!current_user_id.equals(comment_author_id))
+                {
+                    err = new Error("You can not delete this comment //This comment is not belongs to you");
+                    err.status = 403;
+                    return next(err);
+                }
+
 
                 dish.comments.id(req.params.commentId).remove();
 
@@ -333,59 +352,4 @@ dishRouter.route('/:dishId/comments/:commentId')  //comment id
             .catch((err) => next(err));
     })
 
-
-
-
-
-
-
-
-
-
 module.exports = dishRouter;
-
-// dishRouter.router('/');
-// dishRouter.use(bodyParser.json());
-// dishRouter.route('/')
-// .all((req,res,next) => {
-//     res.statusCode = 200;
-//     res.setHeader('Content-Type', 'text/plain');
-//     next();
-// })
-// .get((req,res,next) => {
-//     res.end('Will send all the dishes to you!');
-// })
-// .post((req, res, next) => {
-//     res.end('Will add the dish: ' + req.body.name + ' with details: ' +
-//     req.body.description);
-// })
-// .put((req, res, next) => {
-//     res.statusCode = 403;
-//     res.end('PUT operation not supported on /dishes');
-// })
-//     .delete((req, res, next) => {
-//     res.end('Deleting all dishes');
-// });
-
-// dishRouter.route('/:dishId')
-// .all((req,res,next) => {
-//     res.statusCode = 200;
-//     res.setHeader('Content-Type', 'text/plain');
-//     next();
-// })
-// .get((req,res,next) => {
-//     res.end('Will send details of the dish: ' + req.params.dishId +' to you!');
-// })
-// .post((req, res, next) => {
-//     res.statusCode = 403;
-//     res.end('POST operation not supported on /dishes/'+ req.params.dishId);
-// })
-// .put((req, res, next) => {
-//     res.write('Updating the dish: ' + req.params.dishId + '\n');
-//     res.end('Will update the dish: ' + req.body.name +' with details: ' + req.body.description);
-// })
-// .delete((req, res, next) => {
-//     res.end('Deleting dish: ' + req.params.dishId);
-// });
-
-// module.exports = dishRouter;

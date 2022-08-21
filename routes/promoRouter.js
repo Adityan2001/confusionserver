@@ -22,7 +22,7 @@ promoRouter.route('/')
     })
 
 
-    .post(authenticate.verifyUser,(req, res, next) => {
+    .post(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin,(req, res, next) => {
         Promotions.create(req.body)
             .then((promo) => {
                 res.statusCode = 200;
@@ -37,13 +37,13 @@ promoRouter.route('/')
     })
 
 
-    .put(authenticate.verifyUser,(req, res, next) => {
+    .put(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin,(req, res, next) => {
         res.statusCode = 403;
         res.end('Not Supported on ' + 'promotions');
     })
 
 
-    .delete((req, res, next) => {
+    .delete(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin,(req, res, next) => {
         Promotions.deleteMany({})
             .then((promo) => {
                 res.statusCode = 200;
@@ -77,12 +77,12 @@ promoRouter.route('/:promoId')       //PRomotion Id
     })
 
 
-    .post((req, res, next) => {
+    .post(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin,(req, res, next) => {
         res.end('Post not supported on promotions/promoId');
     })
 
 
-    .put(authenticate.verifyUser,(req, res, next) => {
+    .put(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin,(req, res, next) => {
         Promotions.findByIdAndUpdate(req.params.promoId, { $set: req.body },
             { new: true }).
             then((promo) => {
@@ -97,7 +97,7 @@ promoRouter.route('/:promoId')       //PRomotion Id
             });
     })
 
-    .delete(authenticate.verifyUser,(req, res, next) => {
+    .delete(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin,(req, res, next) => {
         Promotions.findByIdAndDelete(req.params.promoId)
             .then((resp) => {
                 res.statusCode = 200

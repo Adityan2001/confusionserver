@@ -21,7 +21,7 @@ leaderRouter.route('/')
     })
 
 
-    .post(authenticate.verifyUser,(req, res, next) => {
+    .post(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin,(req, res, next) => {
         Leaders.create(req.body)
             .then((leader) => {
                 res.statusCode = 200;
@@ -36,13 +36,13 @@ leaderRouter.route('/')
     })
 
 
-    .put((req, res, next) => {
+    .put(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin,(req, res, next) => {
         res.statusCode = 403;
         res.end('Not Supported on ' + 'leaders');
     })
 
 
-    .delete(authenticate.verifyUser,(req, res, next) => {
+    .delete(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin,(req, res, next) => {
         Leaders.deleteMany({})
             .then((leader) => {
                 res.statusCode = 200;
@@ -61,7 +61,7 @@ leaderRouter.route('/')
 
 
     leaderRouter.route('/:leaderId')       //leader Id
-    .get(authenticate.verifyUser,(req, res, next) => {
+    .get(authenticate.verifyOrdinaryUser,(req, res, next) => {
         Leaders.findById(req.params.leaderId).
             then((leader) => {
                 res.statusCode = 200;
@@ -76,12 +76,12 @@ leaderRouter.route('/')
     })
 
 
-    .post((req, res, next) => {
+    .post(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin,(req, res, next) => {
         res.end('Post not supported on leaders/leaderId');
     })
 
 
-    .put(authenticate.verifyUser,(req, res, next) => {
+    .put(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin,(req, res, next) => {
         Leaders.findByIdAndUpdate(req.params.leaderId, { $set: req.body },
             { new: true }).
             then((leader) => {
@@ -96,7 +96,7 @@ leaderRouter.route('/')
             });
     })
 
-    .delete(authenticate.verifyUser,(req, res, next) => {
+    .delete(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin,(req, res, next) => {
         Leaders.findByIdAndDelete(req.params.leaderId)
             .then((resp) => {
                 res.statusCode = 200

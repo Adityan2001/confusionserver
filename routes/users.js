@@ -5,8 +5,12 @@ var passport=require('passport');
 
 var authenticate = require('../authenticate');
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+router.route('/')
+.get(authenticate.verifyOrdinaryUser,authenticate.verifyAdmin, function(req, res, next) {
+  User.find({}, function (err, user) {
+    if (err) throw err;
+    res.json(user);
+});
 });
 
 router.post('/signup',(req,res,next)=>{
@@ -20,6 +24,7 @@ password,(err,user)=> {
   }else{
       if(req.body.firstname) user.firstname=req.body.firstname;
       if(req.body.lastname) user.lastname=req.body.lastname;
+      if(req.body.admin)  user.admin=req.body.admin;
       user.save((err,user) =>{
         if (err) {
           res.statusCode = 500;

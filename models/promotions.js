@@ -22,11 +22,11 @@ const promotionSchema = new Schema({
         default:''
     },
 
-    // price:{
-    //     type: number,
-    //     required: true,
-    //     min: 0
-    // },
+    price:{
+        type: Number,
+        required: true,
+        min: 0
+    },
 
     description:{
         type: String,
