@@ -85,3 +85,11 @@ router.get('/logout',(req,res,next)=>{
 
 
 module.exports = router;
+
+
+
+// var https = require('https');
+// var fs=require('fs');
+// var options = {
+//   key: fs.readFileSync
+// }
