@@ -145,7 +145,7 @@ favoriteRouter.route('/:favoriteId')
             });
         } else {
             var err = new Error('There is no Favorites');
-            err.status = 401;
+            err.status = 404;
             return next(err);
         }
     });
